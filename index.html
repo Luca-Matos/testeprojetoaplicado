@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOBA - Torneio Oficial de Baralho Acadêmico</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #ffffff;
+      color: #000;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      color: #d00000;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, button {
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #d00000;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .qrcode {
+      margin-top: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bem-vindo ao TOBA</h1>
+  <p style="text-align:center;">Torneio de Truco da UnDF</p>
+
+  <form id="inscricaoForm">
+    <label>Nome da Dupla</label>
+    <input type="text" name="dupla" required />
+
+    <label>Curso e Semestre</label>
+    <input type="text" name="curso" required />
+
+    <label>WhatsApp</label>
+    <input type="text" name="whatsapp" required />
+
+    <label>E-mail</label>
+    <input type="email" name="email" required />
+
+    <button type="submit">Enviar Inscrição</button>
+  </form>
+
+  <button onclick="enviarTeste()" style="margin-top: 2rem; background-color: black; color: white; padding: 0.5rem; border: none; border-radius: 4px; cursor: pointer;">Teste Envio de E-mail</button>
+
+  <div class="qrcode" id="qrcodeArea" style="display:none;">
+    <h2>Finalize sua inscrição com o Pix de R$20</h2>
+    <canvas id="qrcodeCanvas"></canvas>
+    <p id="pixMessage"></p>
+    <p>Chave Pix: <strong>torneiotoba@gmail.com</strong></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    emailjs.init('zT2LshZXQMTh3v9aD');
+
+    document.getElementById('inscricaoForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+      const dupla = formData.get('dupla');
+      const curso = formData.get('curso');
+      const whatsapp = formData.get('whatsapp');
+      const email = formData.get('email');
+
+      const sheetForm = new FormData();
+      sheetForm.append("dupla", dupla);
+      sheetForm.append("curso", curso);
+      sheetForm.append("whatsapp", whatsapp);
+      sheetForm.append("email", email);
+      console.log("Dados enviados:", [...sheetForm.entries()]);
+
+      fetch('https://script.google.com/macros/s/AKfycbxWkaaAcAtHGPAhOnIx_h19vSDAZfcurE2c1F5YBGeMkKz3sg7l3MSjVx8zS06Syk22/exec', {
+        method: 'POST',
+        body: sheetForm
+      }).then(response => response.json())
+        .then(data => {
+          if (data.result === 'success') {
+            emailjs.send("service_ygiw91y", "template_imh8iom", {
+              dupla,
+              curso,
+              whatsapp,
+              email,
+            }).then(() => {
+              alert("Inscrição enviada com sucesso! Agora faça o pagamento do Pix.");
+
+              const duplaLimpa = dupla.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 25);
+              const pixPayload = `00020126410014BR.GOV.BCB.PIX0130torneiotoba@gmail.com520400005303986540520.005802BR59${String(duplaLimpa.length).padStart(2, '0')}${duplaLimpa}6009Brasilia62070503***6304`;
+              QRCode.toCanvas(document.getElementById('qrcodeCanvas'), pixPayload);
+              document.getElementById('pixMessage').textContent = `Incluímos o nome da dupla no Pix: ${duplaLimpa}`;
+              document.getElementById('qrcodeArea').style.display = 'block';
+              form.reset();
+
+            }).catch(() => {
+              alert("Erro ao enviar o e-mail. Mas a inscrição foi registrada na planilha.");
+            });
+          } else {
+            alert("Erro ao salvar a inscrição: " + data.message);
+          }
+        }).catch(() => {
+          alert("Erro ao salvar inscrição. Tente novamente.");
+        });
+    });
+
+    function enviarTeste() {
+      emailjs.send("service_ygiw91y", "template_imh8iom", {
+        dupla: "Lulu e titi",
+        curso: "Engenharia 1º semestre",
+        whatsapp: "61999999999",
+        email: "darkmaluca@gmail.com"
+      }).then(() => {
+        alert("E-mail de teste enviado com sucesso!");
+      }).catch(() => {
+        alert("Erro no envio de teste.");
+      });
+    }
+  </script>
+</body>
+</html>
