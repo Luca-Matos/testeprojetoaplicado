@@ -40,6 +40,13 @@
       margin-top: 2rem;
       text-align: center;
     }
+    .pixLink {
+      display: block;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 <body>
@@ -65,7 +72,7 @@
   <div class="qrcode" id="qrcodeArea" style="display:none;">
     <h2>Finalize sua inscrição com o Pix de R$20</h2>
     <canvas id="qrcodeCanvas"></canvas>
-    <p id="pixMessage"></p>
+    <p id="pixMessage" class="pixLink"></p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
@@ -94,10 +101,9 @@
             const pixPayload = "00020126360014BR.GOV.BCB.PIX0114+5561992902323520400005303986540520.005802BR5918Luca Matos Parente6008Brasilia62070503***6304A107";
             
             QRCode.toCanvas(document.getElementById('qrcodeCanvas'), pixPayload);
-            document.getElementById('pixMessage').textContent = `Pix Copia e Cola: ${pixPayload}`;
+            document.getElementById('pixMessage').textContent = pixPayload;
             document.getElementById('qrcodeArea').style.display = 'block';
 
-            // Envio do email via EmailJS
             emailjs.send("service_ygiw91y", "template_imh8iom", {
               dupla,
               curso,
