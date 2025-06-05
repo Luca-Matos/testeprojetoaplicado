@@ -39,6 +39,7 @@
     .qrcode {
       margin-top: 2rem;
       text-align: center;
+      display: none; /* Inicialmente oculto */
     }
     .pixLink {
       display: block;
@@ -72,16 +73,15 @@
     <button type="submit">Enviar Inscrição</button>
   </form>
 
-  <div class="qrcode" id="qrcodeArea" style="display:none;">
+  <div class="qrcode" id="qrcodeArea">
     <h2>Finalize sua inscrição com o Pix de R$20</h2>
-    <canvas id="qrcodeCanvas"></canvas>
+    <img src="qrpix.jpg" alt="QR Code Pix" style="max-width: 100%;" />
     <p id="pixMessage" class="pixLink"></p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
-    emailjs.init('zT2LshZXQMTh3v9aD');
+    emailjs.init('zT2LshZXQMTh3v9aD'); // Substitua com sua chave real do EmailJS
 
     document.getElementById('inscricaoForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -97,6 +97,30 @@
       .then(data => {
         if (data.includes("Success")) {
           alert("Inscrição enviada com sucesso!");
+
+          // Enviar email de confirmação
+          emailjs.send("service_ygiw91y", "template_imh8iom", {
+            equipe: formData.get("equipe"),
+            participante1: formData.get("participante1"),
+            participante2: formData.get("participante2"),
+            whatsapp: formData.get("whatsapp"),
+            email: formData.get("email"),
+          })
+          .then(response => {
+            console.log("E-mail enviado com sucesso!", response);
+            alert("E-mail de confirmação enviado.");
+          })
+          .catch(error => {
+            console.error("Erro ao enviar e-mail:", error);
+            alert("Erro ao enviar e-mail de confirmação.");
+          });
+
+          // Exibir a área do QR Code
+          document.getElementById("qrcodeArea").style.display = "block";
+
+          // Exibir o código Pix "Copie e Cola"
+          document.getElementById("pixMessage").textContent = "00020126360014BR.GOV.BCB.PIX0114+5561992902323520400005303986540520.005802BR5918Luca Matos Parente6008Brasilia62070503***6304A107";
+
           form.reset();
         } else {
           alert("Erro ao enviar a inscrição. Tente novamente.");
