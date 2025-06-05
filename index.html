@@ -57,10 +57,10 @@
     <label>Nome da Equipe</label>
     <input type="text" name="equipe" required />
 
-    <label>Nome Completo Participante 1</label>
+    <label>Nome Participante 1</label>
     <input type="text" name="participante1" required />
 
-    <label>Nome Completo Participante 2</label>
+    <label>Nome Participante 2</label>
     <input type="text" name="participante2" required />
 
     <label>WhatsApp</label>
@@ -88,46 +88,24 @@
 
       const form = e.target;
       const formData = new FormData(form);
-      const equipe = formData.get('equipe');
-      const participante1 = formData.get('participante1');
-      const participante2 = formData.get('participante2');
-      const whatsapp = formData.get('whatsapp');
-      const email = formData.get('email');
 
-      fetch('https://script.google.com/macros/s/AKfycbxWkaaAcAtHGPAhOnIx_h19vSDAZfcurE2c1F5YBGeMkKz3sg7l3MSjVx8zS06Syk22/exec', {
-        method: 'POST',
-        body: formData
-      }).then(response => response.json())
-        .then(data => {
-          if (data.result === 'success') {
-            alert("Inscrição enviada com sucesso! Agora faça o pagamento do Pix.");
-
-            const pixPayload = "00020126360014BR.GOV.BCB.PIX0114+5561992902323520400005303986540520.005802BR5918Luca Matos Parente6008Brasilia62070503***6304A107";
-            
-            QRCode.toCanvas(document.getElementById('qrcodeCanvas'), pixPayload);
-            document.getElementById('pixMessage').textContent = pixPayload;
-            document.getElementById('qrcodeArea').style.display = 'block';
-
-            emailjs.send("service_ygiw91y", "template_imh8iom", {
-              equipe,
-              participante1,
-              participante2,
-              whatsapp,
-              email
-            }).then(() => {
-              alert("E-mail de confirmação enviado com sucesso!");
-            }).catch((error) => {
-              console.log("Erro ao enviar e-mail:", error);
-              alert("Erro ao enviar o e-mail.");
-            });
-
-            form.reset();
-          } else {
-            alert("Erro ao salvar a inscrição: " + data.message);
-          }
-        }).catch(() => {
-          alert("Erro ao salvar inscrição. Tente novamente.");
-        });
+      fetch("https://script.google.com/macros/s/AKfycbxcJfW8k9al8tGFG5lmNCu7thULGdOJ0oT33jtp_Uswfe8-4QqFhCzdfTCAQL1mi3pz/exec", { 
+        method: "POST",
+        body: new URLSearchParams(formData)
+      })
+      .then(response => response.text())
+      .then(data => {
+        if (data.includes("Success")) {
+          alert("Inscrição enviada com sucesso!");
+          form.reset();
+        } else {
+          alert("Erro ao enviar a inscrição. Tente novamente.");
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao conectar ao Google Sheets:", error);
+        alert("Erro ao salvar inscrição.");
+      });
     });
   </script>
 </body>
