@@ -96,6 +96,20 @@
             QRCode.toCanvas(document.getElementById('qrcodeCanvas'), pixPayload);
             document.getElementById('pixMessage').textContent = `Pix Copia e Cola: ${pixPayload}`;
             document.getElementById('qrcodeArea').style.display = 'block';
+
+            // Envio do email via EmailJS
+            emailjs.send("service_ygiw91y", "template_imh8iom", {
+              dupla,
+              curso,
+              whatsapp,
+              email
+            }).then(() => {
+              alert("E-mail de confirmação enviado com sucesso!");
+            }).catch((error) => {
+              console.log("Erro ao enviar e-mail:", error);
+              alert("Erro ao enviar o e-mail.");
+            });
+
             form.reset();
           } else {
             alert("Erro ao salvar a inscrição: " + data.message);
