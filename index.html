@@ -54,11 +54,14 @@
   <p style="text-align:center;">Torneio de Truco da UnDF</p>
 
   <form id="inscricaoForm">
-    <label>Nome da Dupla</label>
-    <input type="text" name="dupla" required />
+    <label>Nome da Equipe</label>
+    <input type="text" name="equipe" required />
 
-    <label>Curso e Semestre</label>
-    <input type="text" name="curso" required />
+    <label>Nome Participante 1</label>
+    <input type="text" name="participante1" required />
+
+    <label>Nome Participante 2</label>
+    <input type="text" name="participante2" required />
 
     <label>WhatsApp</label>
     <input type="text" name="whatsapp" required />
@@ -85,8 +88,9 @@
 
       const form = e.target;
       const formData = new FormData(form);
-      const dupla = formData.get('dupla');
-      const curso = formData.get('curso');
+      const equipe = formData.get('equipe');
+      const participante1 = formData.get('participante1');
+      const participante2 = formData.get('participante2');
       const whatsapp = formData.get('whatsapp');
       const email = formData.get('email');
 
@@ -105,8 +109,9 @@
             document.getElementById('qrcodeArea').style.display = 'block';
 
             emailjs.send("service_ygiw91y", "template_imh8iom", {
-              dupla,
-              curso,
+              equipe,
+              participante1,
+              participante2,
               whatsapp,
               email
             }).then(() => {
